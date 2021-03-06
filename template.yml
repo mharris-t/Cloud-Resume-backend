@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  CloudFront deployment for website view counter
+
+Resources:
+
+  MyTable:
+    Type: AWS::Serverless::SimpleTable
+
+  ResumeCounterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Lambda/
+      Handler: myapp.myLambdaCounter
+      Runtime: python3.8
+      Events:
+        MyCounterGW:
+          Type: Api
+          Properties:
+            Path: /myVisitCounter
+            Method: get
+            Auth:
+              APIGatewayUsagePlan:
+                Type: AWS::ApiGateway::UsagePlan
+                Properties:
+                  ApiStages:
+                    - ApiId: !Ref ServerlessRestApi
+                      Stage: Prod
+                  Description: Limiting rates for invoking API gateway
+                  Throttle:
+                    BurstLimit: 5
+                    RateLimit: 3
+                  UsagePlanName: MyCounterGWLimiter
+      Environment:
+        Variables: 
+          databaseName : !Ref MyTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MyTable
+
+
+Outputs:
+  MyCounterGWApi:
+    Description: "API Gateway 'MyCounterGW' endpoint URL for Prod stage for myLambdaCounter function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/myVisitCounter/"
