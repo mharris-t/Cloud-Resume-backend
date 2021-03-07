@@ -6,5 +6,5 @@ stack_name = "mycounter-stack"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1d8q1ao7m7077"
 s3_prefix = "mycounter-stack"
 region = "us-east-1"
-confirm_changeset = true
+confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
