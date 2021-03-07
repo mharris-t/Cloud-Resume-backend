@@ -5,6 +5,7 @@ from moto import mock_dynamodb2
 myTableName = os.environ['databaseName'] = 'testing'
 from myapp import myLambdaCounter
 
+#initialize mockdynamodb table
 @pytest.fixture
 def moto_init():
     @mock_dynamodb2
@@ -28,6 +29,7 @@ def moto_init():
         return dynamodb
     return dynamodb_client
 
+#testing the lambda function
 @mock_dynamodb2
 def test_handler_ok(moto_init):
     moto_init()
