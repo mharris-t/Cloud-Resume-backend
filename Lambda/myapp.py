@@ -3,19 +3,20 @@ import boto3
 import os
 from decimal import Decimal
 
-dynamodb = boto3.resource('dynamodb')
-# Set dynamodb table name variable from OS environment
-ddbTableName = os.environ['databaseName']
-table = dynamodb.Table(ddbTableName)
 
+# circumventing decimal error. Could use int/float as well.
 def decimal_default_proc(obj):
     if isinstance(obj, Decimal):
         return float(obj)
     raise TypeError
 
-def myLambdaCounter(event, context):
+#defining interaction event with dynamodb
+def mydynamofunc():
+    dynamodb = boto3.resource('dynamodb')
+    ddbTableName = os.environ['databaseName']
+    table = dynamodb.Table(ddbTableName)
 
-    ddbResponse = table.update_item(
+    dynamoevent = table.update_item(
         Key={
             "id": "WebsiteCounter"
         },
@@ -25,11 +26,15 @@ def myLambdaCounter(event, context):
         },
         ReturnValues="UPDATED_NEW"
     )
-
+    return dynamoevent
+    
+#lambda function is defined here
+def myLambdaCounter(event, context):
+#engage event here from mydynamo function
+    dbEvent = mydynamofunc()
     # DynamoDB response is converted to JSON
-    responseBody = json.dumps({"WebsiteCounter": ddbResponse["Attributes"]["visits"]},default=decimal_default_proc)
-
-    #Interfacing API gateway
+    responseBody = json.dumps({"WebsiteCounter": dbEvent["Attributes"]["visits"]},default=decimal_default_proc)
+    #Interfacing API gateway by sending the necessary headers and payload
     API_GatewayResponse = {
         "isBase64Encoded": False,
         "statusCode": 200,
