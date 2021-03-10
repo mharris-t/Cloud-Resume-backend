@@ -29,7 +29,7 @@ jobs:
         pip install -r Lambda/requirements.txt
 
     - name: Performing PyTest on MyLambdaCounter
-      run: python -m pytest Lambda/test_LambdaCounter.py
+      run: python -m pytest -s Lambda/test_LambdaCounter.py
 
     # Deploy the architecture HOORAH!!!
     - name: SAM Deploy
