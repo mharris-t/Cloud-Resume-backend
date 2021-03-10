@@ -34,6 +34,7 @@ def moto_init():
 def test_handler_ok(moto_init):
     moto_init()
     return_data = myLambdaCounter(0,0)
+    print(return_data)    
     assert return_data['statusCode'] == 200
 
 
